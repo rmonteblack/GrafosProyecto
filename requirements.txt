@@ -1,0 +1,7 @@
+
+networkx
+matplotlib
+numpy
+tk
+pygraphviz
+pandas

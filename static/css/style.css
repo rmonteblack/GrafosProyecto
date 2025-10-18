@@ -1,0 +1,19 @@
+body {
+  background-color: #f5f7fa;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+#network {
+  transition: box-shadow 0.3s;
+}
+
+#network:hover {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+pre {
+  font-family: 'Fira Code', monospace;
+}
