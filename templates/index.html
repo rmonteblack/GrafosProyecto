@@ -78,6 +78,7 @@
       <div class="card-body">
         <h4 class="text-primary fw-bold mb-3">Visualización del Grafo</h4>
         <div id="network" class="border rounded" style="height: 520px; background-color: #ffffff;"></div>
+        <canvas id="graphCanvas" width="800" height="500"></canvas>
       </div>
     </div>
     <div class="card border-0 shadow-sm mt-3">
@@ -88,4 +89,7 @@
     </div>
   </div>
 </div>
+<script src="{{ url_for('static', filename='js/graphVisualizer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graphEvents.js') }}"></script>
+
 {% endblock %}
