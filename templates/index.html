@@ -4,79 +4,108 @@
 {% block content %}
 <div class="row g-4">
   <!-- Panel izquierdo -->
-  <div class="col-md-4">
+  <div class="col-lg-4 col-md-5">
     <div class="card border-0 shadow-sm">
       <div class="card-body">
-        <h4 class="card-title text-primary">Configuración del Grafo</h4>
-        <!-- Añadir Nodo -->
-        <div class="mb-3">
-          <label class="form-label">Añadir Nodo</label>
+        <h4 class="card-title text-primary fw-bold">Configuración del Grafo</h4>
+        <p class="text-muted small">Agrega nodos, aristas y calcula la ruta óptima entre dos puntos.</p>
+
+        <!-- Añadir nodo -->
+        <div class="mb-4">
+          <h6 class="fw-semibold text-secondary">Añadir Nodo</h6>
           <div class="input-group">
-            <input id="nodeInput" class="form-control" placeholder="Ej: A">
+            <input type="text" id="nodeInput" class="form-control" placeholder="Nombre del nodo (ej: A)" maxlength="25">
             <button id="addNodeBtn" class="btn btn-outline-primary">Añadir</button>
           </div>
         </div>
-        <!-- Añadir Arista -->
-        <div class="mb-3">
-          <label class="form-label">Añadir Arista</label>
-          <div class="row g-2">
-            <div class="col-6">
-              <select id="uSelect" class="form-select">
-                <option value="">Origen...</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <select id="vSelect" class="form-select">
-                <option value="">Destino...</option>
-              </select>
-            </div>
-          </div>
-          <div class="input-group mt-2">
-            <span class="input-group-text">Peso</span>
-            <input id="wInput" type="number" class="form-control" placeholder="Peso" value="1">
-          </div>
-          <div class="form-check form-switch mt-2">
-            <input id="directedSwitch" class="form-check-input" type="checkbox" checked>
-            <label class="form-check-label" for="directedSwitch">Dirigido</label>
-          </div>
-          <button id="addEdgeBtn" class="btn btn-outline-success mt-2 w-100">Añadir Arista</button>
-        </div>
+
         <hr>
-        <!-- Calcular ruta -->
-        <div class="mb-3">
-          <label class="form-label">Ruta más corta</label>
-          <div class="row g-2">
-            <div class="col-6"><input id="sourceInput" class="form-control" placeholder="Origen"></div>
-            <div class="col-6"><input id="targetInput" class="form-control" placeholder="Destino"></div>
+
+        <!-- Añadir arista -->
+        <div class="mb-4">
+          <h6 class="fw-semibold text-secondary">Añadir Arista</h6>
+          <div class="row g-2 mb-2">
+            <div class="col-4">
+              <select id="uSelect" class="form-select" data-placeholder="Origen"></select>
+            </div>
+            <div class="col-4">
+              <select id="vSelect" class="form-select" data-placeholder="Destino"></select>
+            </div>
+            <div class="col-4">
+              <input type="number" id="wInput" class="form-control" placeholder="Peso" value="1" step="any">
+            </div>
           </div>
-          <button id="calcBtn" class="btn btn-primary mt-2 w-100">Calcular Ruta</button>
-          <div class="text-center mt-2">
-            <span id="resultText" class="badge bg-info text-dark"></span>
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="directedSwitch" checked>
+            <label class="form-check-label small" for="directedSwitch">Grafo dirigido</label>
+          </div>
+          <button id="addEdgeBtn" class="btn btn-outline-success w-100">Añadir arista</button>
+        </div>
+
+        <hr>
+
+        <!-- Calcular ruta -->
+        <div class="mb-4">
+          <h6 class="fw-semibold text-secondary">Ruta más corta</h6>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <select id="sourceSelect" class="form-select" data-placeholder="Origen"></select>
+            </div>
+            <div class="col-6">
+              <select id="targetSelect" class="form-select" data-placeholder="Destino"></select>
+            </div>
+          </div>
+          <button id="calcBtn" class="btn btn-primary w-100">Calcular Ruta</button>
+
+          <div class="mt-3 text-center">
+            <span id="resultText" class="badge bg-info text-dark p-2"></span>
           </div>
         </div>
-        <div class="d-flex justify-content-between mt-3">
-          <button id="clearGraphBtn" class="btn btn-secondary btn-sm">Limpiar</button>
-          <button id="reloadBtn" class="btn btn-outline-info btn-sm">Actualizar</button>
+
+        <hr>
+
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-secondary btn-sm" id="clearGraphBtn">Limpiar</button>
+          <button class="btn btn-outline-secondary btn-sm" id="downloadGraphBtn">Descargar Grafo</button>
         </div>
       </div>
     </div>
   </div>
+
   <!-- Panel derecho -->
-  <div class="col-md-8">
-    <div class="card border-0 shadow-sm" style="height: 600px;">
-      <div class="card-body d-flex flex-column h-100">
-        <h5 class="text-primary mb-3">Visualización del Grafo</h5>
-        <div class="flex-grow-1 border rounded bg-white d-flex align-items-center justify-content-center">
-          <canvas id="graphCanvas" width="700" height="500" class="w-100 h-100"></canvas>
-        </div>
+  <div class="col-lg-8 col-md-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h4 class="text-primary fw-bold mb-3">Visualización del Grafo</h4>
+        <canvas id="graphCanvas" width="800" height="520" class="border rounded" style="background-color: #ffffff;"></canvas>
       </div>
     </div>
+
+    <!-- Detalles de la ruta -->
     <div class="card border-0 shadow-sm mt-3">
       <div class="card-body">
-        <h6 class="text-secondary">Detalles</h6>
-        <pre id="outputPre" class="bg-light border rounded p-2 small" style="height: 100px; overflow:auto;"></pre>
+        <h6 class="fw-semibold text-secondary">Detalles de la Ruta</h6>
+        <pre id="outputPre" class="bg-light p-2 small border rounded" style="height: 120px; overflow:auto;"></pre>
+      </div>
+    </div>
+
+    <!-- Detalles del autómata -->
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="fw-semibold text-secondary">Detalles del Autómata</h6>
+        <pre id="automataPre" class="bg-light p-2 small border rounded" style="height: 120px; overflow:auto;">
+Alfabeto Σ: { … }
+Estados Q: { … }
+Estado inicial q₀: …
+Estados de aceptación F: { … }
+Transiciones δ: { … }
+        </pre>
       </div>
     </div>
   </div>
 </div>
+
+<!-- 🔹 Scripts -->
+<script src="{{ url_for('static', filename='js/graphVisualizer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graphEvents.js') }}"></script>
 {% endblock %}

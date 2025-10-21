@@ -1,90 +1,63 @@
 from flask import Flask, render_template, request, jsonify
-import networkx as nx
-import matplotlib.pyplot as plt
-import io
-import base64
+from graph_logic import shortest_path_from_payload
 
 app = Flask(__name__)
 
-# Variables globales
-G = nx.DiGraph()  # Por defecto dirigido
-is_directed = True
-
+# Variables globales (simulan los datos del grafo cargados en memoria)
+nodes = []
+edges = []
+directed = True  # por defecto
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
-@app.route('/set_graph_type', methods=['POST'])
-def set_graph_type():
-    global G, is_directed
-    data = request.get_json()
-    graph_type = data.get('type', 'directed')
-
-    is_directed = (graph_type == 'directed')
-    G = nx.DiGraph() if is_directed else nx.Graph()
-
-    return jsonify({'status': 'ok', 'directed': is_directed})
-
-
 @app.route('/add_node', methods=['POST'])
 def add_node():
-    node_name = request.get_json().get('name', '').strip()
-    if not node_name:
-        return jsonify({'error': 'Nombre de nodo inválido'}), 400
-
-    if node_name not in G.nodes:
-        G.add_node(node_name)
-
-    return jsonify({'status': 'ok', 'nodes': list(G.nodes)})
-
+    data = request.get_json()
+    node = data.get('node')
+    if node and node not in nodes:
+        nodes.append(node)
+    return jsonify({"nodes": nodes})
 
 @app.route('/add_edge', methods=['POST'])
 def add_edge():
     data = request.get_json()
+    u = data.get('u')
+    v = data.get('v')
+    w = data.get('w', 1)
+    directed_flag = data.get('directed', directed)
+
+    if u and v:
+        edges.append({
+            "u": u, "v": v, "w": w, "directed": directed_flag
+        })
+        # añadir nodos si no existen
+        if u not in nodes: nodes.append(u)
+        if v not in nodes: nodes.append(v)
+    return jsonify({"edges": edges})
+
+@app.route('/toggle_directed', methods=['POST'])
+def toggle_directed():
+    global directed
+    data = request.get_json()
+    directed = bool(data.get('directed', True))
+    return jsonify({"directed": directed})
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    data = request.get_json()
     source = data.get('source')
     target = data.get('target')
-    weight = float(data.get('weight', 1))
+    result = shortest_path_from_payload(nodes, edges, source, target)
+    return jsonify(result)
 
-    if source not in G.nodes or target not in G.nodes:
-        return jsonify({'error': 'Nodo no válido'}), 400
-    if source == target:
-        return jsonify({'error': 'Un nodo no puede apuntarse a sí mismo'}), 400
-
-    G.add_edge(source, target, weight=weight)
-    return jsonify({'status': 'ok', 'edges': list(G.edges(data=True))})
-
-
-@app.route('/get_graph', methods=['GET'])
-def get_graph():
-    # Dibuja el grafo y devuelve la imagen en base64
-    plt.figure(figsize=(6, 4))
-    pos = nx.spring_layout(G)
-    nx.draw(
-        G, pos,
-        with_labels=True,
-        node_color='skyblue',
-        node_size=1500,
-        font_size=12,
-        font_weight='bold',
-        arrows=is_directed,
-        connectionstyle="arc3,rad=0.1"
-    )
-
-    # Dibujar pesos
-    edge_labels = nx.get_edge_attributes(G, 'weight')
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-
-    buf = io.BytesIO()
-    plt.tight_layout()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    return jsonify({'image': image_base64, 'nodes': list(G.nodes)})
-
+@app.route('/clear', methods=['POST'])
+def clear():
+    global nodes, edges
+    nodes = []
+    edges = []
+    return jsonify({"success": True, "nodes": nodes, "edges": edges})
 
 if __name__ == '__main__':
     app.run(debug=True)
