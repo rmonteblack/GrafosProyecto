@@ -106,4 +106,3 @@ function drawArrow(from, to, directed, weight) {
   ctx.fillStyle = "black";
   ctx.fillText(weight, midX, midY);
 }
-

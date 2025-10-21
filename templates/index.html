@@ -94,4 +94,29 @@
 <!-- 🔹 Scripts -->
 <script src="{{ url_for('static', filename='js/graphVisualizer.js') }}"></script>
 <script src="{{ url_for('static', filename='js/graphEvents.js') }}"></script>
+
+<!-- ⚡ Evitar que un nodo se conecte a sí mismo -->
+<script>
+  const uSelect = document.getElementById("uSelect");
+  const vSelect = document.getElementById("vSelect");
+
+  function disableSelfSelect() {
+    const uVal = uSelect.value;
+    const vVal = vSelect.value;
+
+    for (let option of vSelect.options) {
+      option.disabled = (option.value === uVal);
+    }
+    if (vSelect.value === uVal) vSelect.value = "";
+
+    for (let option of uSelect.options) {
+      option.disabled = (option.value === vVal);
+    }
+    if (uSelect.value === vVal) uSelect.value = "";
+  }
+
+  uSelect.addEventListener("change", disableSelfSelect);
+  vSelect.addEventListener("change", disableSelfSelect);
+</script>
+
 {% endblock %}

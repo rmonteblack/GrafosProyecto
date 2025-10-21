@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from graph_logic import shortest_path_from_payload
+import os
 
 app = Flask(__name__)
 
@@ -27,7 +28,7 @@ def add_edge():
     w = data.get('w', 1)
     directed_flag = data.get('directed', directed)
 
-    if u and v:
+    if u and v and u != v:  # evita que un nodo se apunte a sí mismo
         edges.append({
             "u": u, "v": v, "w": w, "directed": directed_flag
         })
@@ -56,6 +57,27 @@ def clear():
     nodes = []
     edges = []
     return jsonify({"success": True, "nodes": nodes, "edges": edges})
+
+@app.route("/feedback", methods=["POST"])
+def feedback():
+    data = request.get_json()
+    name = data.get("name", "").strip()
+    email = data.get("email", "").strip()
+    message = data.get("message", "").strip()
+
+    if not name or not email or not message:
+        return jsonify({"success": False, "error": "Por favor complete todos los campos."})
+
+    # ruta relativa al archivo app.py
+    base_dir = os.path.dirname(__file__)
+    filepath = os.path.join(base_dir, "feedbacks.txt")
+
+    try:
+        with open(filepath, "a", encoding="utf-8") as f:
+            f.write(f"Nombre: {name}\nCorreo: {email}\nMensaje: {message}\n{'-'*40}\n")
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True)
