@@ -60,7 +60,7 @@ def clear():
 
 @app.route("/feedback", methods=["POST"])
 def feedback():
-    data = request.get_json()
+    data = request.get_json
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
     message = data.get("message", "").strip()
@@ -80,4 +80,7 @@ def feedback():
         return jsonify({"success": False, "error": str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
+
