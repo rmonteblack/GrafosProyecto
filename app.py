@@ -3,10 +3,9 @@ from graph_logic import shortest_path_from_payload
 
 app = Flask(__name__)
 
-# Variables globales (simulan los datos del grafo cargados en memoria)
 nodes = []
 edges = []
-directed = True  # por defecto
+directed = True  
 
 @app.route('/')
 def index():
@@ -32,7 +31,6 @@ def add_edge():
         edges.append({
             "u": u, "v": v, "w": w, "directed": directed_flag
         })
-        # añadir nodos si no existen
         if u not in nodes: nodes.append(u)
         if v not in nodes: nodes.append(v)
     return jsonify({"edges": edges})

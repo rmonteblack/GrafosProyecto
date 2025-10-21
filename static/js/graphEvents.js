@@ -28,25 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function updateAutomataDetails(nodes, edges, source, target) {
-    const Σ = edges.map(e => `${e.u}->${e.v}`).join(", ");
-    const Q = nodes.join(", ");
-    const q0 = source || "N/A";
-    const F = target || "N/A";
-    const δ = edges.map(e => `${e.u} --(${e.w})--> ${e.v}`).join("\n");
-
-    const pre = document.getElementById("automataPre");
-    pre.textContent = `
-Alfabeto Σ: { ${Σ} }
-Estados Q: { ${Q} }
-Estado inicial q₀: ${q0}
-Estados de aceptación F: { ${F} }
-Transiciones δ:
-${δ}
-    `;
-  }
-
-  // 🟢 Añadir nodo
+  // Añadir nodo
   addNodeBtn.addEventListener("click", async () => {
     const nodeInput = document.getElementById("nodeInput");
     let node = nodeInput.value.trim();
@@ -65,7 +47,7 @@ ${δ}
     nodeInput.value = "";
   });
 
-  // 🟡 Añadir arista
+  // Añadir arista
   addEdgeBtn.addEventListener("click", async () => {
     const u = uSelect.value;
     const v = vSelect.value;
@@ -84,7 +66,7 @@ ${δ}
     updateAutomataDetails(nodes, edges, sourceSelect.value, targetSelect.value);
   });
 
-  // 🔵 Cambiar tipo de grafo
+  //Cambiar tipo de grafo
   directedSwitch.addEventListener("change", async () => {
     directed = directedSwitch.checked;
     await fetch("/toggle_directed", {
@@ -95,7 +77,7 @@ ${δ}
     updateAutomataDetails(nodes, edges, sourceSelect.value, targetSelect.value);
   });
 
-  // 🟠 Calcular ruta más corta
+  // Calcular ruta más corta
   calcBtn.addEventListener("click", async () => {
     const source = sourceSelect.value;
     const target = targetSelect.value;
@@ -112,13 +94,13 @@ ${δ}
       outputPre.textContent = `Camino: ${data.path.join(" → ")}`;
       highlightPath(data.path_edges);
     } else {
-      resultText.textContent = "❌ " + data.error;
+      resultText.textContent = "Error: " + data.error;
       outputPre.textContent = "";
     }
     updateAutomataDetails(nodes, edges, source, target);
   });
 
-  // 🔴 Limpiar grafo
+  // Limpiar grafo
   clearGraphBtn.addEventListener("click", async () => {
     await fetch("/clear", { method: "POST" });
     nodes = [];
